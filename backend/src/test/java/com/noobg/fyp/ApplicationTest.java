@@ -1,10 +1,10 @@
-package com.example.demo;
+package com.noobg.fyp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DemoApplicationTests {
+class ApplicationTest {
 
 	@Test
 	void contextLoads() {
