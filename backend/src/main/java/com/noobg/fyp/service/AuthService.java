@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import com.noobg.fyp.configuration.SecurityProperties;
@@ -33,18 +34,19 @@ public class AuthService {
 
 	@Transactional(rollbackOn = { EmailAlreadyTakenException.class })
 	public User signUpUserWithEmailAndPassword(String email, String password) throws EmailAlreadyTakenException {
+		String hashedPassword = hashPassword(password);
 		var user = userService.createUserWithEmail(email);
 		var auth = new BasicAuth();
 		auth.setUser(user);
-		auth.setPassword(password);
+		auth.setPassword(hashedPassword);
 		basicAuthRepository.save(auth);
 		return user;
 	}
 
 	public Optional<String> authenticateUserWithEmailAndPassword(String email, String password) {
 		var auth = basicAuthRepository.findByUserEmail(email).orElseThrow(() -> new UserNotFoundException());
-		if (!password.equals(auth.getPassword())) {
-			return Optional.ofNullable(null);
+		if (!BCrypt.checkpw(password, auth.getPassword())) {
+			return Optional.empty();
 		}
 		return Optional.ofNullable(createJwtToken(auth.getUser()));
 	}
@@ -60,4 +62,9 @@ public class AuthService {
 				.setExpiration(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000))
 				.signWith(SignatureAlgorithm.HS256, securityProperties.getJwtSecret()).compact();
 	}
+
+	public String hashPassword(String password) {
+		return BCrypt.hashpw(password, BCrypt.gensalt());
+	}
+
 }
