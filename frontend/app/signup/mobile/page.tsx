@@ -48,7 +48,7 @@ const page = () => {
         console.log(data)
         reset()
         toast.success("Otp geberated")
-        router.push("/login/mobile/otpvalidation")
+        router.push("/signup/mobile/otpvalidation")
         
     }
 
@@ -84,7 +84,7 @@ const page = () => {
 
             <div>
             <button onClick={()=>{
-                router.push("/login")
+                router.push("/signup")
             }} className='border p-2 rounded-sm '>
                 Another way of sign in using Email .. 
             </button>
