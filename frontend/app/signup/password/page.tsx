@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { z } from 'zod'
+import axios from 'axios'
 
 const page = () => {
     const [passwordClicked, setPasswordClick] = useState(false);
@@ -42,8 +43,10 @@ const page = () => {
         },
         resolver: zodResolver(formSchema)
     })
-    const onsubmit = (data: FormData) => {
+    const onsubmit = async (data: FormData) => {
+
         console.log(data)
+       
         reset()
         toast.success("Password creation succesfull")
     }
