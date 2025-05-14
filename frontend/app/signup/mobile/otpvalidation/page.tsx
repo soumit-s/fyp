@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/input-otp";
 import toast from "react-hot-toast";
 import ErrorMessage from "@/components/ui/ErrorMessage";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     otp: z
@@ -22,6 +23,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const Page = () => {
+    const router = useRouter() ; 
     const {
         control,
         handleSubmit,
@@ -36,6 +38,7 @@ const Page = () => {
         console.log(data);
         reset()
         toast.success("otp validated successfully")
+        router.replace('/home') ; 
 
     };
 

@@ -8,10 +8,12 @@ import toast from 'react-hot-toast'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { z } from 'zod'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 
 const page = () => {
     const [passwordClicked, setPasswordClick] = useState(false);
     const [confirmpasswordClicked, setConfirmpasswordClicked] = useState(false)
+    const router  = useRouter(); 
 
     const formSchema = z.object({
         password: z
@@ -49,6 +51,7 @@ const page = () => {
        
         reset()
         toast.success("Password creation succesfull")
+        router.push("/login") ;
     }
     return (
         <div className='w-screen h-screen flex flex-col justify-center items-center gap-y-4'>
