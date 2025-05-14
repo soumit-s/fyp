@@ -6,6 +6,7 @@ const generateData1 = () => {
   const rating = (Math.floor((Math.random() * 4 + 1) * 10) / 10).toFixed(1);
   const specs = Array.from({ length: 10 }, () => faker.commerce.productDescription()).join(' ');
   const price = faker.commerce.price({ min: 100, max: 1000, dec: 2 }); 
+  
   return {
     // id: faker.datatype.uuid(),  // Correct method for generating UUID
     imgUrl:  ['/demo.jpg' ,'/demo1.jpg' , '/demo2.jpg' ] ,   // Array.from({ length: 3 }, () => faker.image.url()),  // Array of 3 image URLs
@@ -17,16 +18,18 @@ const generateData1 = () => {
 };
 
 const generateData2 = () => {
+  const duration = Math.ceil(Math.random()*(50-0)+0 ); 
   return{
     name : faker.commerce.productName(),
     price : faker.commerce.price({ min: 100, max: 1000000 }),
     imgUrl : ['/demo1.jpg', '/demo1.jpg', '/demo2.jpg'], // Array of 3 image URLs, 
+    duration : duration.toString()  ,
   }
 }
 
 const generateData2Array = ()=>{
   const data = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     data.push(generateData2());
   }
   return data;
@@ -34,5 +37,7 @@ const generateData2Array = ()=>{
 // Generate and export obj1 (an array of 10 objects)
 const obj1 = generateData1();
 const similarItem = generateData2Array() ; 
+
+
 
 export default {obj1 , similarItem } ;

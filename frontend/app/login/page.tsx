@@ -10,11 +10,13 @@ import toast, { Toaster } from 'react-hot-toast';
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const page = () => {
 
     const [passwordClicked, setPasswordClick] = useState(false);
-    // const router = useRouter();
+    const router = useRouter();
+    
 
     const formSchema = z.object({
         email: z.string().email("Invalid Email address"),
@@ -50,9 +52,10 @@ const page = () => {
             email:data.email,
             password:data.password, 
         })
-        if(response.data.ok)
+        if(response.data.ok){
             toast.success("log in successfully ")
-
+            router.push("/home") ; 
+        }
         console.log(response)
         reset()
     }
