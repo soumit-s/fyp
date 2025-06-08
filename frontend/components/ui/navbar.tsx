@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { useRouter } from 'next/navigation';
@@ -8,7 +9,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(' ');
 
   const handleLoginClick = () => {
     router.push('/login');
@@ -17,7 +18,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onSearch(query); 
+    onSearch(query);
   };
 
   return (
@@ -31,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
         value={searchQuery}
         onChange={handleSearchChange}
       />
-      
+
       <div className="flex items-center space-x-4">
         <div className="rounded-full border px-3 py-1">cart</div>
         <div

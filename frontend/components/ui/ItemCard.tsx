@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import toast from 'react-hot-toast';
 
@@ -14,22 +14,32 @@ type ItemCardProps = {
 const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
 
   const router = useRouter();
-
+  const pathName  = usePathname() ; 
 
   const handleView = () => {
     const randomId = Math.floor(Math.random() * 1000);
-    // it will be updated with clicked item id 
-    toast('moved to another obj with random id ');
-    router.replace(`/item/${randomId}`);
-  }
-
-
-
-
+    toast('Moved to another object with random ID');
+  
+    const arr = pathName.split('/').filter(Boolean); // remove leading ''
+  
+    // console.log('Original path:', arr);
+  
+    // Example assumption: /category/[categoryId]/[itemId]/somethinategory-5g
+    // If the ID to replace is at index 2 (third part)
+    if (arr.length >= 2) {
+      arr[2] = String(randomId); // Replace the 3rd segment with the random ID
+    }
+  
+    const newPath = '/' + arr.join('/');
+    // console.log('New path:', newPath);
+  
+    router.push(newPath);
+  };
+  
 
 
   return (
-    <div className='flex flex-col border rounded-2xl p-2  min-w-[20rem] '>
+    <div className='flex flex-col border rounded-2xl p-2  min-w-[20rem] max-w-[25rem]'>
       <div className='w-full h-full  flex flex-col
       '>
         <div className=''>

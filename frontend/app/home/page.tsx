@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/ui/navbar';
+import Category from '@/components/ui/Category';
+import LinkSection from '@/components/ui/LinkSection';
 
 
 const dummyCategories = Array.from({ length: 30 }, (_, index) => ({
@@ -73,35 +75,19 @@ const App: React.FC = () => {
   }, [isLoading, filtered]);
 
 
-  const handleCategoryClick = (categoryId: string) => {
-    router.push(`/category/${categoryId}`);
-  };
 
   return (
     <div>
       <Navbar onSearch={handleSearch} />
-
-      {/* Breadcrumbs */}
-      <div className="px-8 py-2 text-sm text-gray-600">
-        <span className="cursor-pointer text-blue-600" onClick={() => router.push('/')}>
-          Home
-        </span>{' '}
-        {' > '}
-        <span className="text-gray-800">Categories</span>
-      </div>
+      
+      <LinkSection />
 
       {/* Category Grid */}
       <div className="p-8">
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filtered.map((cat) => (
-              <div
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.id)}
-                className="cursor-pointer border rounded-2xl p-6 text-center shadow hover:shadow-lg transition"
-              >
-                <h3 className="text-lg font-semibold">{cat.name}</h3>
-              </div>
+                <Category key={cat.id} cat={cat} />
             ))}
           </div>
         ) : (

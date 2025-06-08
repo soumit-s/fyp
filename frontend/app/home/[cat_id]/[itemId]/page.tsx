@@ -1,14 +1,16 @@
 'use client'
 import React from 'react'
 import { useEffect, useState } from 'react'
-import data from '../../data';
+import data from '../../../data';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import ErrorMessage from '../../../components/ui/ErrorMessage';
+import ErrorMessage from '../../../../components/ui/ErrorMessage';
 import toast from 'react-hot-toast';
 import Rating from '@mui/material/Rating';
 import ItemCard from '@/components/ui/ItemCard';
+import LinkSection from '@/components/ui/LinkSection';
+import {use} from 'react';
 
 interface ItemDetails {
 	imgUrl: string[];
@@ -21,14 +23,13 @@ interface SimilarItem {
 	imgUrl: string[];
 	name: string;
 	price: string;
+	duration : string , 
 }
+
 const { obj1, similarItem } = data;
 
-const page = ({ params }: { params: { itemId: string } }) => {
-	// console.log(obj1) ; 
-	const { itemId } = React.use(params);
-	// console.log(itemId)
-
+const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
+	const { itemId } = use(params)
 
 	// db call to fetch item details from DB based on itemId; 
 	// let obj = DB call  ;
@@ -49,10 +50,10 @@ const page = ({ params }: { params: { itemId: string } }) => {
 			let { imgUrl, name, rating, specs, price } = obj1;
 			let ratings = rating.toString();
 			setitemDetails({ imgUrl, name, ratings, specs, price });
-			console.log(rating);
+			// console.log(rating);
 		}
 		fetchDetails();
-		console.log(obj1);
+		// console.log(obj1);
 	}, [itemId]);
 
 	const [imgIndex, setImgIndex] = useState(0);
@@ -96,7 +97,7 @@ const page = ({ params }: { params: { itemId: string } }) => {
 		resolver: zodResolver(formSchema)
 	})
 	const submitHandler = async (data: FormSchema) => {
-		console.log("pincode", data.pincode)
+		// console.log("pincode", data.pincode)
 		// api call backkend-> check pincode
 		reset();
 	}
@@ -124,7 +125,8 @@ const page = ({ params }: { params: { itemId: string } }) => {
 
 	return (
 		<div className='w-[100vw] h-[100vh] flex flex-col '>
-			<div className='w-[100vw] flex mx-auto  p-10 gap-x-10 h-[60%] '>
+			<div className='flex items-center pt-1 mx-2'> <LinkSection /> </div>
+			<div className='border w-[100vw] flex mx-auto  p-10 gap-x-10 h-[58%] '>
 				{/* left */}
 				<div className='w-[50%]  p-4  relative' >
 
