@@ -3,144 +3,126 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar"
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useForm } from 'react-hook-form'
 import * as z from 'zod';
 import { DatePickerDemo } from '@/components/calender'
 import { Button } from "@/components/ui/button";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
+const formSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  middleName: z.string().max(50).optional(),
+  lastName: z.string().min(1, "Last name is required"),
+  dob: z.coerce.date().refine((date) => date < new Date("2026-01-01"), "DOB must be before Jan 1, 2026"),
+  address: z.string().min(1, "Address is required"),
+  phone: z.string().regex(/^[0-9]{10}$/, "Phone must be 10 digits"),
+  email: z.string().email("Invalid email address"),
+});
 
+type FormSchema = z.infer<typeof formSchema>;
 
-const UserProfile = ({ params }: { params: { userId: string } }) => {
-	const userId = params;  // userId from url
-	//  console.log(params)
-	// const [isEditable, setIseditable] = useState(false);
+const SignUpPage = () => {
+  const router = useRouter();
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      dob: new Date('2000-01-01'),
+      address: "",
+      phone: "",
+      email: ""
+    }
+  });
 
-	const formSchema = z.object({
-		firstName: z.string().min(1, "First name cannot be empty").max(50, "First name is too long"),  // Ensure valid first name 
-		middleName: z.string().max(50, "Middle name is too long").optional(), // Ensure valid Middle name 
-		lastName: z.string().min(1, "Last name cannot be empty").max(50, "Last name is too long"), // Ensure Last name 
-		dob: z.coerce.date().refine((date) => {
-			const cutoffDate = new Date("2026-01-01"); // LET ,DOB must be before Jan 1, 2006
-			return date < cutoffDate;
-		}, "DOB must be before Jan 1, 2026"),
-		address: z.string().min(1, "Address cannot be empty").max(200, "Address is too long"),
-		phone: z.string()
-			.regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"), // Ensures 10-digit numeric input
-		email: z.string().email("Invalid email format") // Ensures valid email format
-	});
+  const onSubmit = async (data: FormSchema) => {
+    console.log(data);
+    toast.success("Signed up successfully!");
+    // router.push('/login');
+    reset();
+  };
 
+  const handleDateChange = (dob?: Date) => {
+    if (dob) setValue("dob", dob);
+  };
 
-	type formSchema = z.infer<typeof formSchema>
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-2xl space-y-6">
+        
+        {/* Heading */}
+        <h2 className="text-2xl font-bold text-black text-center">Create Account / Sign Up</h2>
 
-	const {
-		register,
-		handleSubmit,
-		reset,
-		watch,
-		setValue,
-		formState: { errors },
-	} = useForm({
-		defaultValues: {
-			firstName: "akhdssd",
-			middleName: "djkasd",
-			lastName: "jjdd",
-			dob: new Date('2023-01-01'),
-			address: "jdkksldmcncnsdsdka fakdndnksdf kdfd",
-			phone: "8888888888",
-			email: "soummojitcha@gmail.com"
-		},
-		resolver: zodResolver(formSchema),
-	})
+        <div className="flex justify-center">
+          <Avatar className="w-28 h-28">
+            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+        </div>
 
-	const onSubmit = (data: formSchema) => {
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* First and Middle Name */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Input placeholder="First Name" {...register("firstName")} />
+              <ErrorMessage message={errors.firstName?.message} />
+            </div>
+            <div>
+              <Input placeholder="Middle Name" {...register("middleName")} />
+              <ErrorMessage message={errors.middleName?.message} />
+            </div>
+          </div>
 
-		console.log("submitted")
-		console.log(data)
-		toast.success('All changes are saved')
-		// reset();
-		// setIseditable((prev) => (!prev))
-	}
-	const handleDateChange = (dob?: Date) => {
-		if (dob) {
-			console.log(dob)
-			setValue("dob", dob)
-		}
-	}
-	const handleCancling = () => {
-		toast('All values set to default ')
-		reset()
-		// setIseditable((prev)=>(!prev))
-	}
+          {/* Last Name and DOB */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Input placeholder="Last Name" {...register("lastName")} />
+              <ErrorMessage message={errors.lastName?.message} />
+            </div>
+            <div>
+              <DatePickerDemo value={watch('dob')} onChange={handleDateChange} />
+              <ErrorMessage message={errors.dob?.message} />
+            </div>
+          </div>
 
-	return (
-		<div>
+          {/* Phone and Email */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Input placeholder="Phone" {...register("phone")} />
+              <ErrorMessage message={errors.phone?.message} />
+            </div>
+            <div>
+              <Input placeholder="Email" {...register("email")} />
+              <ErrorMessage message={errors.email?.message} />
+            </div>
+          </div>
 
-			<div className='w-[80%] border border-black h-screen mx-auto text-black'>
-				<div>
-					<Avatar className="w-[14rem] h-[14rem]">
-						<AvatarImage src="https://github.com/shadcn.png" />
-						<AvatarFallback>CN</AvatarFallback>
-					</Avatar>
+          {/* Address */}
+          <div>
+            <Input placeholder="Address" {...register("address")} />
+            <ErrorMessage message={errors.address?.message} />
+          </div>
 
-					<form onSubmit={handleSubmit(onSubmit)}>
-						<div>
-							<div>
-								<Input placeholder="First Name" className="placeholder:text-grey-900"
+          {/* Buttons */}
+          <div className="flex gap-4 justify-end pt-2">
+            <Button type="submit" className="bg-blue-600 text-white">Save Details</Button>
+            <Button type="button" variant="outline" onClick={() => reset()}>Cancel</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
-									{...register("firstName")} />
-								<ErrorMessage message={errors.firstName?.message} />
-							</div>
-							<div>
-								<Input placeholder="Middle name " className="placeholder:text-grey-900"{...register("middleName")}  />
-								<ErrorMessage message={errors.middleName?.message} />
-							</div>
-							<div>
-								<Input placeholder="Last name " className="placeholder:text-grey-900"{...register("lastName")}  />
-								<ErrorMessage message={errors.lastName?.message} />
-							</div>
-						</div>
-						<div>
-							<div >
-								<p>DOB :</p>
-								<DatePickerDemo value={watch('dob')} onChange={handleDateChange} />
-							</div>
-							<div>
-								<Input {...register('phone')} />
-								<ErrorMessage message={errors.phone?.message} />
-							</div>
-
-							<div>
-								<Input {...register('email')} />
-								<ErrorMessage message={errors.email?.message} />
-							</div>
-
-						</div>
-						<div>
-							<Input {...register('address')} />
-							<ErrorMessage message={errors.address?.message} />
-						</div>
-
-						<div className="flex gap-x-4">
-							{
-								(<Button type="submit" className="text-white">Save Details </Button>)
-							}
-							{
-								(<Button type="button" className="text-white" onClick={handleCancling}>Cancel Editing </Button>)
-							}
-						</div>
-					</form>
-				</div>
-
-
-
-			</div>
-
-		</div>
-	)
-}
-
-export default UserProfile
+export default SignUpPage;
