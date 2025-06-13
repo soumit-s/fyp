@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        "geist-mono": "var(--font-geist-mono)",
+        "geist": "var(--font-geist-sans)"
+      },
       colors: {
         background: "hsl(0, 0%, 100%)",
         foreground: "hsl(222.2, 84%, 4.9%)",
@@ -28,11 +32,11 @@ module.exports = {
         muted: "hsl(220, 14%, 96%)",
         mutedForeground: "hsl(215.4, 16.3%, 46.9%)",
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
+      // borderRadius: {
+      //   lg: "var(--radius)",
+      //   md: "calc(var(--radius) - 2px)",
+      //   sm: "calc(var(--radius) - 4px)",
+      // },
     },
   },
   plugins: [require("tailwindcss-animate")],

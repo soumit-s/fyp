@@ -5,7 +5,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-geist tracking-wide;
   }
   body {
     @apply bg-background text-foreground;

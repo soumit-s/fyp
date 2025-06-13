@@ -1,210 +1,273 @@
-'use client'
-import React from 'react'
-import { useEffect, useState } from 'react'
-import data from '../../../data';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import ErrorMessage from '../../../../components/ui/ErrorMessage';
-import toast from 'react-hot-toast';
-import Rating from '@mui/material/Rating';
-import ItemCard from '@/components/ui/ItemCard';
-import LinkSection from '@/components/ui/LinkSection';
-import {use} from 'react';
+"use client";
+import React from "react";
+import { useEffect, useState } from "react";
+import data from "../../../data";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ErrorMessage from "../../../../components/ui/ErrorMessage";
+import toast from "react-hot-toast";
+import Rating from "@mui/material/Rating";
+import ItemCard from "@/components/common/ItemCard";
+import LinkSection from "@/components/ui/LinkSection";
+import { use } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeftCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightCircleIcon,
+  ChevronRightIcon,
+  CircleIcon,
+  DotIcon,
+  HeartIcon,
+  IndianRupeeIcon,
+  ShoppingCartIcon,
+} from "lucide-react";
+import { Item } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import StyledRating from "@/components/common/StyledRating";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface ItemDetails {
-	imgUrl: string[];
-	name: string;
-	ratings: string;
-	specs: string;
-	price: string;
+  imgUrl: string[];
+  name: string;
+  ratings: string;
+  specs: string;
+  price: string;
 }
 interface SimilarItem {
-	imgUrl: string[];
-	name: string;
-	price: string;
-	duration : string , 
+  imgUrl: string[];
+  name: string;
+  price: string;
+  duration: string;
 }
+
+const formSchema = z.object({
+  pincode: z.preprocess(
+    (val) =>
+      typeof val === "string" || typeof val === "number"
+        ? Number(val)
+        : undefined,
+    z
+      .number({
+        required_error: "Pincode is required",
+        invalid_type_error: "Pincode must be a number",
+      })
+      .int()
+      .min(100000, "Pincode must be at least 6 digits")
+      .max(999999, "Pincode must be at most 6 digits")
+  ),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
 
 const { obj1, similarItem } = data;
 
 const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
-	const { itemId } = use(params)
+  const { itemId } = use(params);
 
-	// db call to fetch item details from DB based on itemId; 
-	// let obj = DB call  ;
-	const [urlImg, setUrlImg] = useState<string>(obj1?.imgUrl[0]);
+  // db call to fetch item details from DB based on itemId;
+  // let obj = DB call  ;
+  const [urlImg, setUrlImg] = useState<string>(obj1?.imgUrl[0]);
 
-	const [itemDetails, setitemDetails] = useState<ItemDetails>({
-		imgUrl: [],
-		name: "",
-		ratings: "",
-		specs: "",
-		price: "",
-	});
+  const [itemDetails, setitemDetails] = useState<ItemDetails>({
+    imgUrl: [],
+    name: "",
+    ratings: "",
+    specs: "",
+    price: "",
+  });
 
-	useEffect(() => {
-		const fetchDetails = () => {
-			toast('ID changed to ' + itemId);
-			// api call to fetch item details based on itemId
-			let { imgUrl, name, rating, specs, price } = obj1;
-			let ratings = rating.toString();
-			setitemDetails({ imgUrl, name, ratings, specs, price });
-			// console.log(rating);
-		}
-		fetchDetails();
-		// console.log(obj1);
-	}, [itemId]);
+  useEffect(() => {
+    const fetchDetails = () => {
+      toast("ID changed to " + itemId);
+      // api call to fetch item details based on itemId
+      let { imgUrl, name, rating, specs, price } = obj1;
+      let ratings = rating.toString();
+      setitemDetails({ imgUrl, name, ratings, specs, price });
+      // console.log(rating);
+    };
+    fetchDetails();
+    // console.log(obj1);
+  }, [itemId]);
 
-	const [imgIndex, setImgIndex] = useState(0);
-	let n = itemDetails.imgUrl.length;
+  const [imgIndex, setImgIndex] = useState(0);
+  let n = itemDetails.imgUrl.length;
 
-	const handleRightArrowClick = () => {
-		// Logic to handle right arrow click
-		// console.log("Right arrow clicked");
-		let newIndex = (imgIndex + 1) % n;
-		setImgIndex(newIndex);
-		setUrlImg(itemDetails.imgUrl[newIndex]);
-		// console.log("img setted , next index ->" , newIndex )
-	}
-	const handleLeftArrowClick = () => {
-		// Logic to handle right arrow click
-		// console.log("Left arrow clicked");
-		let newIndex = imgIndex - 1 >= 0 ? imgIndex - 1 : n - 1;
-		setImgIndex(newIndex);
-		setUrlImg(itemDetails.imgUrl[newIndex]);
-		// console.log("img setted ->" , newIndex )
-	}
-	const formSchema = z.object({
-		pincode: z.preprocess(
-			(val) => (typeof val === 'string' || typeof val === 'number') ? Number(val) : undefined,
-			z
-				.number({
-					required_error: 'Pincode is required',
-					invalid_type_error: 'Pincode must be a number',
-				})
-				.int()
-				.min(100000, 'Pincode must be at least 6 digits')
-				.max(999999, 'Pincode must be at most 6 digits')
-		),
-	});
+  const handleRightArrowClick = () => {
+    // Logic to handle right arrow click
+    // console.log("Right arrow clicked");
+    let newIndex = (imgIndex + 1) % n;
+    setImgIndex(newIndex);
+    setUrlImg(itemDetails.imgUrl[newIndex]);
+    // console.log("img setted , next index ->" , newIndex )
+  };
+  const handleLeftArrowClick = () => {
+    // Logic to handle right arrow click
+    // console.log("Left arrow clicked");
+    let newIndex = imgIndex - 1 >= 0 ? imgIndex - 1 : n - 1;
+    setImgIndex(newIndex);
+    setUrlImg(itemDetails.imgUrl[newIndex]);
+    // console.log("img setted ->" , newIndex )
+  };
 
-	type FormSchema = z.infer<typeof formSchema>;
-	const { register, handleSubmit, reset, formState: { errors } } = useForm<FormSchema>({
-		defaultValues: {
-			pincode: undefined,
-		},
-		resolver: zodResolver(formSchema)
-	})
-	const submitHandler = async (data: FormSchema) => {
-		// console.log("pincode", data.pincode)
-		// api call backkend-> check pincode
-		reset();
-	}
-	const handleAddToWishlist = () => {
-		// api call to add to wishlist ->id :: itemId
-		toast.success("Added to wishlist")
-	}
-	const handleAddToCart = () => {
-		// api call to add to cart -> id :: itemId 
-		toast.success("Added to cart")
-	}
-	const handleRentNow = () => {
-		// api call to rent now -> id :: itemId
-		toast("moved to buy now page")
-	}
-	//Similar item load 
-	const [similarItems, setSimilarItems] = useState<SimilarItem[]>([]);
-	useEffect(() => {
-		// api call to get similar items based on itemId
-		setSimilarItems(similarItem);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormSchema>({
+    defaultValues: {
+      pincode: undefined,
+    },
+    resolver: zodResolver(formSchema),
+  });
+  const submitHandler = async (data: FormSchema) => {
+    // console.log("pincode", data.pincode)
+    // api call backkend-> check pincode
+    reset();
+  };
+  const handleAddToWishlist = () => {
+    // api call to add to wishlist ->id :: itemId
+    toast.success("Added to wishlist");
+  };
+  const handleAddToCart = () => {
+    // api call to add to cart -> id :: itemId
+    toast.success("Added to cart");
+  };
+  const handleRentNow = () => {
+    // api call to rent now -> id :: itemId
+    toast("moved to buy now page");
+  };
+  //Similar item load
+  const [similarItems, setSimilarItems] = useState<Item[]>([]);
+  useEffect(() => {
+    // api call to get similar items based on itemId
+    setSimilarItems(similarItem);
+  }, [itemId]);
 
-	}, [itemId])
+  return (
+    <div className="flex flex-col gap-8 pb-20 mt-8">
+      <div className="flex mx-auto gap-x-16">
+        {/* left */}
+        <div className="relative w-1/2">
+          <div className="h-full mx-auto overflow-hidden rounded-2xl">
+            <img src={urlImg} className="w-full h-full" />
+          </div>
+          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-4">
+            {/* left */}
+            <button
+              onClick={handleLeftArrowClick}
+              className="bg-white rounded-full p-2"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+            </button>
 
+            {/* right  */}
+            <button
+              onClick={handleRightArrowClick}
+              className="bg-white rounded-full p-2"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+        {/* right */}
+        <div className="flex flex-col w-1/2 justify-center gap-y-6">
+          <h1 className="font-bold text-4xl"> {itemDetails.name} </h1>
+          <div>
+            <div className="flex items-center gap-4">
+              <div className="flex gap-2 items-center">
+                <StyledRating
+                  name="read-only"
+                  value={parseFloat(itemDetails.ratings)}
+                  precision={0.5}
+                  readOnly
+                  size="small"
+                />
+                <span className="text-sm font-semibold">(14)</span>
+              </div>
+              {/* <CircleIcon className="w-[0.2rem] h-[0.2rem] text-neutral-400" /> */}
+              <DotIcon className="text-neutral-400" />
+              <div className="items-center flex gap-1">
+                <IndianRupeeIcon className="w-4 h-4" />{" "}
+                <b>{itemDetails.price}</b>
+              </div>
+              <DotIcon className="text-neutral-400" />
+              <div className="text-sm font-semibold">2 remaining</div>
+            </div>
+            <div className="text-sm leading-relaxed mt-4">
+              {" "}
+              {itemDetails.specs}{" "}
+            </div>
+          </div>
+          <div>
+            {/* delivery date call */}
+            <form onSubmit={handleSubmit(submitHandler)}>
+              <div className="flex gap-x-4 items-center">
+                <label className="flex gap-x-4 justify-center items-center text-sm">
+                  <p className="text-left text-neutral-600">
+                    Check delivery date
+                  </p>
+                  <Input type="number" {...register("pincode")} />
+                </label>
+                <Button type="submit" variant="outline">
+                  Check
+                </Button>
+              </div>
+              {errors.pincode && (
+                <div className="mt-4 text-sm">
+                  <ErrorMessage message={errors.pincode.message} />
+                </div>
+              )}
+            </form>
 
+            <div>{/* delivery Date */}</div>
+          </div>
+          <div className="w-full">
+            <Button onClick={handleRentNow} className="w-full py-6">
+              Rent Now
+            </Button>
+          </div>
+          <div className="w-full flex items-center gap-x-4">
+            <Button onClick={handleAddToWishlist} variant="ghost">
+              <HeartIcon />
+              Add to Wishlist
+            </Button>
+            <div className="h-6 border-l border-l-neutral-200"></div>
+            <Button onClick={handleAddToCart} variant="ghost">
+              <ShoppingCartIcon />
+              Add to Cart
+            </Button>
+          </div>
+        </div>
+      </div>
 
-	return (
-		<div className='w-[100vw] h-[100vh] flex flex-col '>
-			<div className='flex items-center pt-1 mx-2'> <LinkSection /> </div>
-			<div className='border w-[100vw] flex mx-auto  p-10 gap-x-10 h-[58%] '>
-				{/* left */}
-				<div className='w-[50%]  p-4  relative' >
+      {/* similar items  */}
 
-					<div className='border h-full w-[92%] mx-auto overflow-hidden rounded-2xl'>
-						<img src={urlImg} className='w-full h-full' />
-					</div>
-					{/* right  */}
-					<button className='hover:cursor-pointer absolute right-0 top-[35%]' onClick={handleRightArrowClick}>
-						<i className="ri-arrow-right-circle-fill text-[3rem] absolute right-0 top-[35%] " ></i>
-					</button>
-					{/* left */}
-					<button className='hover:cursor-pointer border absolute left-0 top-[35%]' onClick={handleLeftArrowClick}>
-						<i className="ri-arrow-left-circle-fill text-[3rem] absolute left-0 top-[35%]" ></i>
-					</button>
-				</div>
-				{/* right */}
-				<div className='w-[40%] flex flex-col justify-center items-center gap-y-6'>
-					<div> {itemDetails.name}   </div>
-					<div>
-						{
-							<Rating
-								name="read-only"
-								value={parseFloat(itemDetails.ratings)}
-								precision={0.5}
-								readOnly
-							/>
-						}
-						<div> {itemDetails.specs}  </div>
-						<div> price :: {itemDetails.price}</div>
-					</div>
-					<div>
-						{/* delivery date call */}
-						<form onSubmit={handleSubmit(submitHandler)}>
-							<div className='flex gap-x-2'>
-								<label className='flex gap-x-4 justify-center items-center'>
-									<p className='text-left'>Check delivery date</p>
-									<input type="number" className='border border-black' {...register("pincode")} />
-								</label>
-								<button type='submit' className='border p-2' >
-									<p className='text-left'>Check</p>
-								</button>
-							</div>
-							<div>
-								{
-									errors.pincode && (<ErrorMessage message={errors.pincode.message} />)
-								}
-							</div>
-						</form>
+      <Carousel className="mt-8">
+        <CarouselContent className="-ml-10">
+          {similarItems.length > 0 &&
+            similarItems.map((item, index) => {
+              // ** fix ::  add item id in schema and pass it to item card
+              return (
+                <CarouselItem key={index} className="basis-1/6 pl-10" >
+                  <ItemCard item={item} />
+                </CarouselItem>
+              );
+            })}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
+  );
+};
 
-						<div>{ /* delivery Date */}</div>
-					</div>
-					<div className='w-full flex justify-evenly gap-x-4 mx-auto'>
-						<button onClick={handleAddToWishlist} className='border p-2 rounded-sm w-[40%]'> Add to Wishlist </button>
-						<button onClick={handleAddToCart} className='border p-2 rounded-sm w-[40%]' > Add to Cart </button>
-					</div>
-					<div className='w-full'>
-						<button onClick={handleRentNow} className='border p-2 rounded-sm w-full'>Rent Now</button>
-					</div>
-				</div>
-			</div>
-
-			{/* similar items  */}
-			<div className='p-2 w-[100vw] h-[40%] relative'>
-				<div className='p-4 mx-auto flex w-[95%]  h-full gap-x-10 overflow-x-scroll'>
-					{
-						similarItems.length > 0 && (
-							similarItems.map((item, index) => {
-								// ** fix ::  add item id in schema and pass it to item card
-								return (<ItemCard key={index} item = {item} />)
-							}
-							)
-						)
-					}
-				</div>
-			</div>
-
-		</div>
-	)
-}
-
-export default page
+export default page;

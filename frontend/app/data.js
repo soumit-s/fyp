@@ -21,9 +21,11 @@ const generateData2 = () => {
   const duration = Math.ceil(Math.random()*(50-0)+0 ); 
   return{
     name : faker.commerce.productName(),
-    price : faker.commerce.price({ min: 100, max: 1000000 }),
-    imgUrl : ['/demo1.jpg', '/demo1.jpg', '/demo2.jpg'], // Array of 3 image URLs, 
+    price : faker.commerce.price({ min: 100, max: 1000 }),
+    imgUrl : '/demo1.jpg', // Array of 3 image URLs, 
     duration : duration.toString()  ,
+    rating: faker.number.int({ min: 0, max: 10 }) / 2,
+    numRatings: faker.number.int({ min: 0, max: 100 })
   }
 }
 
