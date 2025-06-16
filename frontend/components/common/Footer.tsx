@@ -17,7 +17,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-primary text-white">
-      <div className="flex justify-center p-20 pt-20 pb-32">
+      <div className="flex justify-center p-20 pt-16 pb-16">
         <div className="flex gap-32">
           <div>
             <div className="text-5xl font-bold mb-4">Rentell</div>
@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="text-center mb-8">Copyright &copy; 2025</div>
+      <div className="text-center mb-8 text-sm font-light">Copyright &copy; 2025</div>
     </footer>
   );
 }

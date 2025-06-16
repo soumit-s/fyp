@@ -10,39 +10,46 @@ import { Button } from "@/components/ui/button";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useUserProfile } from "@/lib/hooks";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   middleName: z.string().max(50).optional(),
   lastName: z.string().min(1, "Last name is required"),
-  dob: z.coerce.date().refine((date) => date < new Date("2026-01-01"), "DOB must be before Jan 1, 2026"),
+  dateOfBirth: z.coerce.date().refine((date) => date < new Date("2026-01-01"), "DOB must be before Jan 1, 2026"),
   address: z.string().min(1, "Address is required"),
-  phone: z.string().regex(/^[0-9]{10}$/, "Phone must be 10 digits"),
-  email: z.string().email("Invalid email address"),
+  // phone: z.string().regex(/^[0-9]{10}$/, "Phone must be 10 digits"),
+  state: z.string(),
+  province: z.string(),
+  country: z.string(),
+  pinCode: z.number(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const SignUpPage = () => {
+const ProfilePage = () => {
   const router = useRouter();
+  const profile = useUserProfile();
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
+    values: profile.data,
     defaultValues: {
       firstName: "",
       middleName: "",
       lastName: "",
-      dob: new Date('2000-01-01'),
+      dateOfBirth: new Date('2000-01-01'),
       address: "",
-      phone: "",
-      email: ""
+      state: "",
+      province: "",
+      country: "",
+      pinCode: 0,
     }
   });
 
@@ -53,17 +60,12 @@ const SignUpPage = () => {
     reset();
   };
 
-  const handleDateChange = (dob?: Date) => {
-    if (dob) setValue("dob", dob);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-100">
       <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-2xl space-y-6">
         
         {/* Heading */}
-        <h2 className="text-2xl font-bold text-black text-center">Create Account / Sign Up</h2>
-
+        <h2 className="text-2xl font-bold text-black">Profile</h2>
         <div className="flex justify-center">
           <Avatar className="w-28 h-28">
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -91,23 +93,12 @@ const SignUpPage = () => {
               <ErrorMessage message={errors.lastName?.message} />
             </div>
             <div>
-              <DatePickerDemo value={watch('dob')} onChange={handleDateChange} />
-              <ErrorMessage message={errors.dob?.message} />
+              {/* <DatePickerDemo value={watch('dob')} onChange={handleDateChange} /> */}
+              <ErrorMessage message={errors.dateOfBirth?.message} />
             </div>
           </div>
 
           {/* Phone and Email */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Input placeholder="Phone" {...register("phone")} />
-              <ErrorMessage message={errors.phone?.message} />
-            </div>
-            <div>
-              <Input placeholder="Email" {...register("email")} />
-              <ErrorMessage message={errors.email?.message} />
-            </div>
-          </div>
-
           {/* Address */}
           <div>
             <Input placeholder="Address" {...register("address")} />
@@ -125,4 +116,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default ProfilePage;

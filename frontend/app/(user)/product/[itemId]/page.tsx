@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
 import { useEffect, useState } from "react";
-import data from "../../../data";
+import data from "@/lib/data";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ErrorMessage from "../../../../components/ui/ErrorMessage";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 import toast from "react-hot-toast";
 import Rating from "@mui/material/Rating";
 import ItemCard from "@/components/common/ItemCard";
@@ -21,6 +21,7 @@ import {
   DotIcon,
   HeartIcon,
   IndianRupeeIcon,
+  Loader2Icon,
   ShoppingCartIcon,
 } from "lucide-react";
 import { Item } from "@/lib/types";
@@ -33,6 +34,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useAddToCart, useProduct, useWishlistProduct } from "@/lib/hooks";
 
 interface ItemDetails {
   imgUrl: string[];
@@ -75,7 +77,9 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
   // db call to fetch item details from DB based on itemId;
   // let obj = DB call  ;
   const [urlImg, setUrlImg] = useState<string>(obj1?.imgUrl[0]);
-
+  const product = useProduct({ productId: itemId });
+  const { addToCart } = useAddToCart({ productId: Number.parseInt(itemId) });
+  const { wishlist, dewishlist } = useWishlistProduct({ productId: Number.parseInt(itemId) });
   const [itemDetails, setitemDetails] = useState<ItemDetails>({
     imgUrl: [],
     name: "",
@@ -133,14 +137,7 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
     // api call backkend-> check pincode
     reset();
   };
-  const handleAddToWishlist = () => {
-    // api call to add to wishlist ->id :: itemId
-    toast.success("Added to wishlist");
-  };
-  const handleAddToCart = () => {
-    // api call to add to cart -> id :: itemId
-    toast.success("Added to cart");
-  };
+
   const handleRentNow = () => {
     // api call to rent now -> id :: itemId
     toast("moved to buy now page");
@@ -151,6 +148,18 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
     // api call to get similar items based on itemId
     setSimilarItems(similarItem);
   }, [itemId]);
+
+  if (product.isLoading) {
+    return (
+      <div className="h-40 w-full">
+        <Loader2Icon className="animate-spin w-8 h-8" />
+      </div>
+    );
+  }
+
+  if (!product.data) {
+    return <div className="h-40 w-full">Oops :( Something went wrong</div>;
+  }
 
   return (
     <div className="flex flex-col gap-8 pb-20 mt-8">
@@ -180,31 +189,35 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
         </div>
         {/* right */}
         <div className="flex flex-col w-1/2 justify-center gap-y-6">
-          <h1 className="font-bold text-4xl"> {itemDetails.name} </h1>
+          <h1 className="font-bold text-4xl"> {product.data.name} </h1>
           <div>
             <div className="flex items-center gap-4">
               <div className="flex gap-2 items-center">
                 <StyledRating
                   name="read-only"
-                  value={parseFloat(itemDetails.ratings)}
+                  value={product.data.ratingAverage}
                   precision={0.5}
                   readOnly
                   size="small"
                 />
-                <span className="text-sm font-semibold">(14)</span>
+                <span className="text-sm font-semibold">
+                  ({product.data.ratingCount})
+                </span>
               </div>
               {/* <CircleIcon className="w-[0.2rem] h-[0.2rem] text-neutral-400" /> */}
               <DotIcon className="text-neutral-400" />
               <div className="items-center flex gap-1">
                 <IndianRupeeIcon className="w-4 h-4" />{" "}
-                <b>{itemDetails.price}</b>
+                <b>{product.data.dailyPrice}</b>{" "}
+                <span className="text-xs">per day</span>
               </div>
               <DotIcon className="text-neutral-400" />
-              <div className="text-sm font-semibold">2 remaining</div>
+              <div className="text-sm font-semibold">
+                {product.data.remainingStock} remaining
+              </div>
             </div>
             <div className="text-sm leading-relaxed mt-4">
-              {" "}
-              {itemDetails.specs}{" "}
+              {product.data.description}
             </div>
           </div>
           <div>
@@ -236,12 +249,21 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
             </Button>
           </div>
           <div className="w-full flex items-center gap-x-4">
-            <Button onClick={handleAddToWishlist} variant="ghost">
-              <HeartIcon />
-              Add to Wishlist
+            <Button onClick={() => product.data?.isWishlisted ? dewishlist() : wishlist()} variant="ghost">
+              {!product.data.isWishlisted ? (
+                <>
+                  <HeartIcon />
+                  Add to Wishlist
+                </>
+              ) : (
+                <>
+                  <HeartIcon fill="red" />
+                  Wishlisted
+                </>
+              )}
             </Button>
             <div className="h-6 border-l border-l-neutral-200"></div>
-            <Button onClick={handleAddToCart} variant="ghost">
+            <Button onClick={() => addToCart()} variant="ghost">
               <ShoppingCartIcon />
               Add to Cart
             </Button>
@@ -257,7 +279,7 @@ const page = ({ params }: { params: Promise<{ itemId: string }> }) => {
             similarItems.map((item, index) => {
               // ** fix ::  add item id in schema and pass it to item card
               return (
-                <CarouselItem key={index} className="basis-1/6 pl-10" >
+                <CarouselItem key={index} className="basis-1/6 pl-10">
                   <ItemCard item={item} />
                 </CarouselItem>
               );
